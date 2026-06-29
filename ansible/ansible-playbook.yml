@@ -1,0 +1,73 @@
+---
+- name: Main server
+  hosts: all_nodes
+  become: true
+
+  tasks:
+    - name: update cache
+      apt:
+        update_cache: yes
+    - name: install needed packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - gnupg
+          - git
+        state: present
+    - name: make dir for keyrings
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
+
+    - name: download gpg key
+      get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: "0644"
+
+    - name: add official repo
+      apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} stable"
+        state: present
+        filename: docker
+
+    - name: install docker packages
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+        update_cache: yes
+
+    - name: enable docker in systemd
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+- name: Config main server
+  become: true
+  hosts: main_server
+  #tasks:
+
+- name: Config worker servers
+  become: true
+  hosts: worker_nodes
+  tasks:
+    - name: Make a /srv/www directory
+      file:
+        path: /srv/www
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+
+    - name: Copy compose.yml
+      copy:
+        src: ../compose_files/worker_nodes/
+        dest: /srv/www/
