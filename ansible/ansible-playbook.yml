@@ -60,8 +60,51 @@
 - name: Config main server
   become: true
   hosts: main_server
-  #tasks:
+  vars:
+    k3s_args: "--disable servicelb --disable traefik"
+  tasks:
+    - name: Installation required dependencies
+      apt:
+        name:
+          - cgroup-tools
+        state: present
+        update_cache: yes
+    - name: Install k3s
+      shell: |
+        curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="{{ k3s_args }}" sh -
+      args:
+        creates: /usr/local/bin/k3s
 
+    - name: Wait for K3s node to become Ready
+      shell: k3s kubectl get nodes | grep -q "Ready"
+      register: k3s_ready
+      until: k3s_ready.rc == 0
+      retries: 10
+      delay: 5
+
+    - name: Configure kubectl permissions for ubuntu user
+      file:
+        path: /home/ubuntu/.kube
+        state: directory
+        owner: ubuntu
+        group: ubuntu
+        mode: "0755"
+
+    - name: Copy K3s kubeconfig to ubuntu user directory
+      copy:
+        src: /etc/rancher/k3s/k3s.yaml
+        dest: /home/ubuntu/.kube/config
+        remote_src: yes
+        owner: ubuntu
+        group: ubuntu
+        mode: "0600"
+
+    - name: Adjust kubeconfig to use localhost
+      replace:
+        path: /home/ubuntu/.kube/config
+        regexp: "127.0.0.1"
+        replace: "localhost"
+#----------------------------------------------------------
 - name: Config worker servers
   become: true
   hosts: worker_nodes
