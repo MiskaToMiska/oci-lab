@@ -20,6 +20,4 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /srv/www
-
-            docker compose up -d
+            docker compose -f /srv/www/compose.yml up -d

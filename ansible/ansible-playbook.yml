@@ -51,6 +51,12 @@
         state: started
         enabled: yes
 
+    - name: add user to the docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
 - name: Config main server
   become: true
   hosts: main_server
@@ -60,14 +66,10 @@
   become: true
   hosts: worker_nodes
   tasks:
-    - name: Make a /srv/www directory
-      file:
-        path: /srv/www
-        state: directory
-        owner: ubuntu
-        group: ubuntu
-
     - name: Copy compose.yml
       copy:
         src: ../compose_files/worker_nodes/
         dest: /srv/www/
+        mode: "0644"
+        owner: ubuntu
+        group: ubuntu
