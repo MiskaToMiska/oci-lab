@@ -5,14 +5,14 @@ services:
     image: nginx:alpine
     container_name: nginx_web01
     volumes:
-      - /srv/www/web01:/usr/share/nginx/html:ro
+      - /srv/www/html/web01:/usr/share/nginx/html:ro
     ports:
       - "8080:80"
   nginx_web02:
     image: nginx:alpine
     container_name: nginx_web02
     volumes:
-      - /srv/www/web02:/usr/share/nginx/html:ro
+      - /srv/www/html/web02:/usr/share/nginx/html:ro
     ports:
       - "8081:80"
 
