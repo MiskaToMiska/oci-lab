@@ -8,3 +8,7 @@ misek.duckdns.org {
 grafana.misek.duckdns.org {
     reverse_proxy grafana:3000
 }
+k3s.misek.duckdns.org {
+    reverse_proxy localhost:30080
+}
+
