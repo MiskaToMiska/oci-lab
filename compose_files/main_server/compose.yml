@@ -45,5 +45,5 @@ services:
 volumes:
   caddy_data:
   caddy_config:
-  prometheus:
+  prometheus_data:
   grafana_data:
