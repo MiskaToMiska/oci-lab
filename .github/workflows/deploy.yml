@@ -20,7 +20,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "compose_files/worker_nodes/*"
-          target: "/srv/www"
+          target: "/home/ubuntu/app" 
           strip_components: 2
 
       - name: SSH login and composing up
@@ -30,5 +30,10 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+           
+            sudo mkdir -p /srv/www
+            sudo cp -r /home/ubuntu/app/* /srv/www/
+            sudo chown -r ubuntu:ubuntu /srv/www
+            
             cd /srv/www
             docker compose up -d
