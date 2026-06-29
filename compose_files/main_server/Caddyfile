@@ -1,0 +1,6 @@
+misek.duckdns.org {
+    reverse_proxy 10.0.1.172:8080 10.0.1.172:8081
+}
+grafana.misek.duckdns.org {
+    reverse_proxy localhost:3000
+}

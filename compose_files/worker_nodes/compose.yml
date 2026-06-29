@@ -1,0 +1,31 @@
+services:
+  #python_app:
+  #to do
+  nginx_web01:
+    image: nginx:alpine
+    container_name: nginx_web01
+    volumes:
+      - /srv/www/web01:/usr/share/nginx/html:ro
+    ports:
+      - "8080:80"
+  nginx_web02:
+    image: nginx:alpine
+    container_name: nginx_web02
+    volumes:
+      - /srv/www/web02:/usr/share/nginx/html:ro
+    ports:
+      - "8081:80"
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node_exporter
+    restart: always
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($|/)"
